@@ -36,6 +36,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        String ed = "10 ";
+
+        User user = new User();
+        user.edad = Integer.parseInt(ed);
+
 
         TextView tvSaludo = findViewById(R.id.tvSaludo);
         EditText etSaludo = findViewById(R.id.etSaludo);

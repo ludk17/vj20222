@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import okhttp3.Credentials;
 
@@ -52,6 +53,9 @@ public class LoginActivity extends AppCompatActivity {
                 sharedEditor.apply();
 
                 redirectToMainActivity();
+
+
+                Toast.makeText(getApplicationContext(), "Mensaje que se muestra en el TOAST", Toast.LENGTH_LONG).show();
 
             }
         });

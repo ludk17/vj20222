@@ -6,5 +6,6 @@ public class User {
     public int id;
     public String name;
     public String avatar;
+    public int edad;
     public String createdAt;
 }
