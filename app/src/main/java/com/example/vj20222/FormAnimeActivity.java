@@ -1,13 +1,24 @@
 package com.example.vj20222;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.vj20222.entities.Anime;
@@ -15,6 +26,7 @@ import com.example.vj20222.factories.RetrofitFactory;
 import com.example.vj20222.services.AnimeService;
 import com.google.gson.Gson;
 
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 import retrofit2.Call;
@@ -24,11 +36,18 @@ import retrofit2.Retrofit;
 
 public class FormAnimeActivity extends AppCompatActivity {
 
+    private final static int CAMERA_REQUEST = 1000;
+
     private Anime anime = new Anime();
     private EditText etFormAnimeName;
     private EditText etFormAnimeDescription;
     private EditText etFormAnimePosterURL;
     private Button btnSaveAnime;
+    private Button btnTakePhoto;
+    private Button btnOpenGallery;
+
+    private ImageView ivPhoto;
+
     private Retrofit retrofit;
 
 
@@ -41,9 +60,14 @@ public class FormAnimeActivity extends AppCompatActivity {
         etFormAnimeDescription = findViewById(R.id.etFormAnimeDescription);
         etFormAnimePosterURL = findViewById(R.id.etFormAnimePosterURL);
 
-        etFormAnimePosterURL.setText("https://m.media-amazon.com/images/I/710NAj9qNVL._AC_UY1000_.jpg");
+//        etFormAnimePosterURL.setText("https://m.media-amazon.com/images/I/710NAj9qNVL._AC_UY1000_.jpg");
 
         btnSaveAnime = findViewById(R.id.btnSaveAnime);
+        btnTakePhoto = findViewById(R.id.btnTakePhoto);
+        btnOpenGallery = findViewById(R.id.btnOpenGallery);
+
+        ivPhoto = findViewById(R.id.ivPhoto);
+
         retrofit = new RetrofitFactory(this).build();
 
         Intent intent  = getIntent();
@@ -58,6 +82,31 @@ public class FormAnimeActivity extends AppCompatActivity {
             etFormAnimePosterURL.setText(anime.posterURL);
         }
 
+        btnTakePhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                // preguntar si tiene permisos
+                if(checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                    abrirCamara();
+                } else {
+                    requestPermissions(new String[] {Manifest.permission.CAMERA}, 100);
+                }
+                // pediro los permisios
+            }
+        });
+
+        btnOpenGallery.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                    openGallery();
+                } else {
+                    requestPermissions(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE}, 101);
+                }
+            }
+        });
+
         btnSaveAnime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -65,6 +114,56 @@ public class FormAnimeActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == CAMERA_REQUEST && resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            ivPhoto.setImageBitmap(imageBitmap);
+        }
+
+        if(requestCode == 1001) {
+            String[] filePathColumn = {MediaStore.Images.Media.DATA};
+            Cursor cursor = getContentResolver().query(data.getData(), filePathColumn, null, null, null);
+            cursor.moveToFirst();
+            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+            String picturePath = cursor.getString(columnIndex);
+            cursor.close();
+            Bitmap imageBitmap = BitmapFactory.decodeFile(picturePath);
+            ivPhoto.setImageBitmap(imageBitmap);
+
+
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+            byte[] byteArray = byteArrayOutputStream .toByteArray();
+
+            String encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
+
+            Log.i("MAIN_APP", encoded);
+
+
+
+        }
+
+    }
+
+    private void openGallery() {
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType("image/*");
+        startActivityForResult(intent, 1001);
+
+    }
+
+
+    private void abrirCamara() {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(intent, CAMERA_REQUEST); //requestCode numero cualquiera
     }
 
     private void saveAnime(Anime anime) {

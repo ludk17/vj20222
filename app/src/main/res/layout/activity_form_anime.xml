@@ -36,9 +36,29 @@
             android:text="Name" />
 
         <Button
+            android:id="@+id/btnTakePhoto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Take Photo" />
+
+        <Button
+            android:id="@+id/btnOpenGallery"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Get Image from gallery" />
+
+        <Button
             android:id="@+id/btnSaveAnime"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Button" />
+
+        <ImageView
+            android:id="@+id/ivPhoto"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            tools:srcCompat="@tools:sample/avatars" />
+
+
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
