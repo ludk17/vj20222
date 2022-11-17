@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.example.vj20222.database.AppDatabase;
 import com.example.vj20222.entities.User;
 import com.example.vj20222.factories.RetrofitFactory;
 import com.example.vj20222.services.UserService;
@@ -29,75 +30,32 @@ import retrofit2.Retrofit;
 
 public class MainActivity extends AppCompatActivity {
 
-    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        String ed = "10 ";
+        AppDatabase db = AppDatabase.getInstance(this);
 
         User user = new User();
-        user.edad = Integer.parseInt(ed);
+        user.name = "Jose Jose";
+        user.avatar = "https://img.png";
+        user.edad = 33;
+        user.createdAt = "2022-11-17";
+
+//        db.userDao().create(user);
 
 
-        TextView tvSaludo = findViewById(R.id.tvSaludo);
-        EditText etSaludo = findViewById(R.id.etSaludo);
+        List<User> users = db.userDao().getAll();
 
-//        Log.i("MAIN_APP", sharedPreferences.getString("AUTHORIZATION", null));
+        Log.i("MAIN_APP", new Gson().toJson(users));
 
-        Retrofit retrofit = new RetrofitFactory(this).build();
-        UserService service = retrofit.create(UserService.class);
+        User u1 = db.userDao().find(1);
 
-        service.all().enqueue(new Callback<List<User>>() {
-            @Override
-            public void onResponse(Call<List<User>> call, Response<List<User>> response) {
-                Log.i("MAIN_APP", new Gson().toJson(response.body()));
-            }
-
-            @Override
-            public void onFailure(Call<List<User>> call, Throwable t) {
-                Log.i("MAIN_APP", "FAIlED");
-                Log.e("MAIN_APP", t.toString());
-            }
-        });
+        Log.i("MAIN_APP", new Gson().toJson(u1));
 
 
-
-
-        View.OnClickListener clickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        };
-
-
-//        Retrofit retrofit = RetrofitFactory.build("abc");
-
-
-
-
-
-        Button btnAlert = findViewById(R.id.btnAlert);
-        btnAlert.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-//                String text = etSaludo.getText().toString();
-//                tvSaludo.setText(text);
-//                Log.d("MAIN_APP", "Hola Mundo desde implementación en variable");
-
-                Intent intent = new Intent(getApplicationContext(), SecondActivity.class);
-
-                intent.putExtra("NOMBRE", "Luis");
-                intent.putExtra("APELLIDO", "Mendoza");
-                intent.putExtra("SALUDO", etSaludo.getText().toString());
-
-                startActivity(intent);
-
-            }
-        });
     }
 
 

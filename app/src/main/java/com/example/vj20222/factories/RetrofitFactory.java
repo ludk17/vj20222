@@ -21,7 +21,7 @@ public class RetrofitFactory {
     }
 
 
-    public  Retrofit build() {
+    public  Retrofit build(String baseUrl, String auth) {
 
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
         httpClient.addInterceptor(new Interceptor() {
@@ -30,7 +30,7 @@ public class RetrofitFactory {
                 Request original = chain.request();
 
                 Request request = original.newBuilder()
-                        .header("Authorization", sharedPreferences.getString("AUTHORIZATION", null))
+                        .header("Authorization", auth)
                         .method(original.method(), original.body())
                         .build();
 
@@ -41,7 +41,7 @@ public class RetrofitFactory {
 
         OkHttpClient client = httpClient.build();
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://6357e146c26aac906f34fd25.mockapi.io/")
+                .baseUrl(baseUrl)
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(client)
                 .build();

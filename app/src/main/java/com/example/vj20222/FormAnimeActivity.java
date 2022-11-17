@@ -22,17 +22,22 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.vj20222.entities.Anime;
+import com.example.vj20222.entities.Image;
+import com.example.vj20222.entities.ImageResponse;
 import com.example.vj20222.factories.RetrofitFactory;
 import com.example.vj20222.services.AnimeService;
+import com.example.vj20222.services.ImageService;
 import com.google.gson.Gson;
 
 import java.io.ByteArrayOutputStream;
 import java.util.List;
 
+import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class FormAnimeActivity extends AppCompatActivity {
 
@@ -68,7 +73,7 @@ public class FormAnimeActivity extends AppCompatActivity {
 
         ivPhoto = findViewById(R.id.ivPhoto);
 
-        retrofit = new RetrofitFactory(this).build();
+        retrofit = new RetrofitFactory(this).build("","");
 
         Intent intent  = getIntent();
         String animeJson = intent.getStringExtra("ANIME_DATA");
@@ -126,6 +131,39 @@ public class FormAnimeActivity extends AppCompatActivity {
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
             ivPhoto.setImageBitmap(imageBitmap);
+
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+            byte[] byteArray = byteArrayOutputStream .toByteArray();
+
+            String imgBase64 = Base64.encodeToString(byteArray, Base64.DEFAULT);
+
+
+            Retrofit retrofit = new RetrofitFactory(this)
+                    .build("https://api.imgur.com", "Client-ID 8bcc638875f89d9");
+
+            ImageService imageService = retrofit.create(ImageService.class);
+            Image image = new Image();
+            image.image = imgBase64;
+
+            imageService.sendImage(image).enqueue(new Callback<ImageResponse>() {
+                @Override
+                public void onResponse(Call<ImageResponse> call, Response<ImageResponse> response) {
+                    ImageResponse r = response.body();
+
+                  //gurdarPelicula()
+
+                }
+
+                @Override
+                public void onFailure(Call<ImageResponse> call, Throwable t) {
+
+                }
+            });
+
+
+
+
         }
 
         if(requestCode == 1001) {
@@ -151,6 +189,24 @@ public class FormAnimeActivity extends AppCompatActivity {
 
         }
 
+    }
+
+    private void GuardarPelicula() {
+        Retrofit r2 = new RetrofitFactory(FormAnimeActivity.this).build("http/api", "");
+
+        AnimeService s = r2.create(AnimeService.class);
+
+        s.create(new Anime()).enqueue(new Callback<Anime>() {
+            @Override
+            public void onResponse(Call<Anime> call, Response<Anime> response) {
+
+            }
+
+            @Override
+            public void onFailure(Call<Anime> call, Throwable t) {
+
+            }
+        });
     }
 
     private void openGallery() {

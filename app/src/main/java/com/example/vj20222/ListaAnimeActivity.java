@@ -31,21 +31,21 @@ public class ListaAnimeActivity extends AppCompatActivity {
         rvAnime = findViewById(R.id.rvAnime);
         rvAnime.setLayoutManager(new LinearLayoutManager(this));
 
-        Retrofit retrofit = new RetrofitFactory(this).build();
-        AnimeService service = retrofit.create(AnimeService.class);
-
-        service.get().enqueue(new Callback<List<Anime>>() {
-            @Override
-            public void onResponse(Call<List<Anime>> call, Response<List<Anime>> response) {
-
-                rvAnime.setAdapter(new AnimeAdapter(response.body()));
-            }
-
-            @Override
-            public void onFailure(Call<List<Anime>> call, Throwable t) {
-                Log.e("MAIN_APP", t.toString());
-            }
-        });
+//        Retrofit retrofit = new RetrofitFactory(this).build();
+//        AnimeService service = retrofit.create(AnimeService.class);
+//
+//        service.get().enqueue(new Callback<List<Anime>>() {
+//            @Override
+//            public void onResponse(Call<List<Anime>> call, Response<List<Anime>> response) {
+//
+//                rvAnime.setAdapter(new AnimeAdapter(response.body()));
+//            }
+//
+//            @Override
+//            public void onFailure(Call<List<Anime>> call, Throwable t) {
+//                Log.e("MAIN_APP", t.toString());
+//            }
+//        });
 
 
     }
